@@ -26,31 +26,37 @@ async def on_ready():
 @client.event
 async def on_message(message):
     global projects
-    if message.author == client.user:
+    if message.author.bot:
         return
     
     if "!pm" in message.content:
         response = "Unrecognized command, please use `!pm help` for a full command list"
+
         if "clear" in message.content:
             response = """```Projects has been cleared!```"""
             projects = {}
 
         if "vote" in message.content:
             token = message.content.lower().split()
-            if token[-1] == "vote" or token[-2] == "vote":
-                response = """```Please specify the project that you want to vote: !pm vote [projectName] [ratio]```"""
+            if token[-1] == "vote":
+                response = """```Please specify the project that you want to vote: !pm vote [projectName]```"""
             else:
-                try:
-                    if message.author in projects[token[-2]]['voters']:
-                        response = """@{}, you cannot vote multiple times!  """.format(message.author.split("#")[0])
-                    else:
-                        ratio = token[-1].split("/")
-                        ratio = int(ratio[0]) / int(ratio[1])
-                        projects[token[-2]]['vote'] += ratio
-                        projects[token[-2]]['voters'].add(message.author) 
-                        response = """@{}, thanks for voting!""".format(message.author.split("#")[0])
-                except:
-                    pass
+                projectName = token[-1]                
+                if (projectName in projects):
+                    for member in message.channel.members:
+                        if not member.bot:
+                            await member.send("""```Voting for {}```""".format(projectName))
+                # try:
+                #     if message.author in projects[token[-2]]['voters']:
+                #         response = """@{}, you cannot vote multiple times!  """.format(message.author.split("#")[0])
+                #     else:
+                #         ratio = token[-1].split("/")
+                #         ratio = int(ratio[0]) / int(ratio[1])
+                #         projects[token[-2]]['vote'] += ratio
+                #         projects[token[-2]]['voters'].add(message.author) 
+                #         response = """@{}, thanks for voting!""".format(message.author.split("#")[0])
+                # except:
+                #     pass
 
         if "help" in message.content:
             response = """```Here are available commands:
